@@ -1,0 +1,48 @@
+pub mod msg;
+pub use msg::*;
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    #[test]
+    fn test_proto_types_to_json() {
+        let transport = TransportType::Cdc;
+        let bus = BusType::I2c;
+        let operation = Operation::Read;
+
+        let transport = serde_json::to_string(&transport).unwrap();
+        let bus = serde_json::to_string(&bus).unwrap();
+        let operation = serde_json::to_string(&operation).unwrap();
+        println!("transport: {}", transport);
+        println!("bus: {}", bus);
+        println!("operation: {}", operation);
+    }
+
+    #[test]
+    fn test_proto_msg_json_conversion() {
+        // 创建 Protobuf 消息
+        let proto_msg = Msg {
+            transport: TransportType::Cdc as i32,
+            bus: BusType::I2c as i32,
+            operation: Operation::Read as i32,
+            address: 0x50,
+            data: Some(vec![1, 2, 3, 4, 5]),
+            delay_us: Some(1000),
+        };
+
+        // 转换为 JSON
+        let json = serde_json::to_string(&proto_msg).expect("Failed to convert to JSON");
+        println!("converted JSON: {}", json);
+
+        // 从 JSON 解析回 Protobuf 消息
+        let parsed_msg: Msg = serde_json::from_str(&json).expect("Failed to parse from JSON");
+
+        // 验证字段
+        assert_eq!(proto_msg.transport, parsed_msg.transport);
+        assert_eq!(proto_msg.bus, parsed_msg.bus);
+        assert_eq!(proto_msg.operation, parsed_msg.operation);
+        assert_eq!(proto_msg.address, parsed_msg.address);
+        assert_eq!(proto_msg.data, parsed_msg.data);
+    }
+}

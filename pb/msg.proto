@@ -1,0 +1,38 @@
+syntax = "proto3";
+package msg;
+
+
+
+// 定义消息类型
+message Msg {
+    /// 传输类型
+    TransportType transport = 1;
+    /// 总线类型
+    BusType bus = 2;
+    /// 操作类型
+    Operation operation = 3;
+    /// 地址
+    uint32 address = 4;
+    /// 数据
+    optional bytes data = 5;
+    /// 延时
+    optional uint64 delay_us = 6;
+}
+
+// 定义枚举类型
+enum TransportType {
+    Cdc = 0;
+    WebSocket = 1;
+}
+
+enum BusType {
+    I2C = 0;
+    SPI = 1;
+}
+
+enum Operation {
+    Ack = 0;
+    Read = 1;
+    Write = 2;
+    Transfer = 3;
+}

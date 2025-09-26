@@ -1,4 +1,4 @@
-use crate::{BridgeError, Message, Transport};
+use crate::{BridgeError, Msg, Transport};
 use async_trait::async_trait;
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, WebSocketStream};
@@ -29,12 +29,12 @@ impl Transport for WebSocketTransport {
         todo!()
     }
 
-    async fn rx(&mut self) -> Result<Message, BridgeError> {
+    async fn rx(&mut self) -> Result<Msg, BridgeError> {
         // Implementation here
         todo!()
     }
 
-    async fn tx(&mut self, message: Message) -> Result<(), BridgeError> {
+    async fn tx(&mut self, msg: Msg) -> Result<(), BridgeError> {
         // Implementation here
         todo!()
     }

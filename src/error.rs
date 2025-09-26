@@ -11,8 +11,8 @@ pub enum BridgeError {
     #[error("Connection error: {0}")]
     ConnectionError(String),
 
-    #[error("Invalid message format: {0}")]
-    MessageError(String),
+    #[error("Invalid msg format: {0}")]
+    MsgError(String),
 
     #[error("Operation timeout")]
     Timeout,
