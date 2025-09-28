@@ -8,7 +8,8 @@ license = "MIT"
 repository = "https://github.com/listentodella/peripheral-bridge"
 
 [dependencies]
-tokio = { version = "1.0", features = ["full"] }
+# 这里暂时不去使用 full features, 防止嵌入式侧遇到编译问题
+tokio = { version = "1.47.1", features = ["net", "rt", "time", "io-std", "io-util", "macros", "rt-multi-thread"] }
 tokio-tungstenite = "0.28.0"
 async-trait = "0.1"
 thiserror = "2.0.16"
@@ -21,7 +22,7 @@ prost-types = "0.14.1"
 prost-serde = "0.3.0"
 env_logger = "0.11.8"
 
-tokio-websockets = { version = "0.12.1", features = ["server", "openssl"] }
+tokio-websockets = { version = "0.12.1", features = ["server", "fastrand", "sha1_smol"] }
 futures-util = "0.3.31"
 http = "1.3.1"
 

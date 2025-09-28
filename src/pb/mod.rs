@@ -1,5 +1,7 @@
 pub mod msg;
 pub use msg::*;
+// re-export prost
+pub use prost;
 
 #[cfg(test)]
 mod tests {
