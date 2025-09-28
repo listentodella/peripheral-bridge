@@ -1,12 +1,12 @@
+use anyhow::Result;
 use async_trait::async_trait;
-
 pub mod bus;
 pub mod error;
 pub mod pb;
 pub mod transport;
 
 use error::BridgeError;
-use pb::Msg;
+use pb::{Msg, MsgBatch};
 
 /// Core trait for transport layer implementations
 /// 定义了与外设通信的基本操作, 如连接、断开连接、接收数据和发送数据
@@ -15,16 +15,16 @@ use pb::Msg;
 #[async_trait]
 pub trait Transport {
     /// Establish connection
-    async fn connect(&mut self) -> Result<(), BridgeError>;
+    async fn connect(&mut self) -> Result<()>;
 
     /// Close connection
-    async fn disconnect(&mut self) -> Result<(), BridgeError>;
+    async fn disconnect(&mut self) -> Result<()>;
 
     /// Receive msg from host
-    async fn rx(&mut self) -> Result<Msg, BridgeError>;
+    async fn rx(&mut self) -> Result<MsgBatch>;
 
     /// Send msg to host
-    async fn tx(&mut self, msg: Msg) -> Result<(), BridgeError>;
+    async fn tx(&mut self, msgs: &[Msg]) -> Result<()>;
 
     /// Check connection status
     fn is_connected(&self) -> bool;
@@ -34,16 +34,11 @@ pub trait Transport {
 #[async_trait]
 pub trait PeripheralBus {
     /// Write data to peripheral
-    async fn write(&mut self, addr: u8, data: &[u8]) -> Result<(), BridgeError>;
+    async fn write(&mut self, addr: u8, data: &[u8]) -> Result<()>;
 
     /// Read data from peripheral
-    async fn read(&mut self, addr: u8, len: usize) -> Result<Vec<u8>, BridgeError>;
+    async fn read(&mut self, addr: u8, len: usize) -> Result<Vec<u8>>;
 
     /// Perform read-write transaction
-    async fn transfer(
-        &mut self,
-        addr: u8,
-        write: &[u8],
-        read_len: usize,
-    ) -> Result<Vec<u8>, BridgeError>;
+    async fn transfer(&mut self, addr: u8, write: &[u8], read_len: usize) -> Result<Vec<u8>>;
 }

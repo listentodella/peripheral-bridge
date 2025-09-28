@@ -11,20 +11,41 @@ async fn main() -> anyhow::Result<()> {
         return Ok(());
     }
     let mut count = 0u8;
+    info!("test start");
     loop {
-        let tx_msg = Msg {
+        let tx_msg0 = Msg {
             transport: TransportType::Cdc as i32,
             bus: BusType::I2c as i32,
-            operation: Operation::Read as i32,
-            address: 0x50,
-            data: Some(vec![1, 2, 3, 4, count]),
-            delay_us: Some(1000),
+            seqs: vec![BusOps {
+                operation: Operation::Read as i32,
+                address: 0x50,
+                data: Some(vec![1, 2, 3, 4, count]),
+                delay_us: Some(1000),
+            }],
         };
-        ws_transport.tx(tx_msg).await?;
-        let rx_msg = ws_transport.rx().await?;
-        debug!("Received message: {:?}", rx_msg);
-        count += 1;
-        if count >= 10 {
+        let tx_msg1 = Msg {
+            transport: TransportType::Cdc as i32,
+            bus: BusType::Spi as i32,
+            seqs: vec![
+                BusOps {
+                    operation: Operation::Read as i32,
+                    address: 0x51,
+                    data: Some(vec![count, 4, 3, 2, 1]),
+                    delay_us: Some(100),
+                },
+                BusOps {
+                    operation: Operation::Write as i32,
+                    address: 0x51,
+                    data: Some(vec![count, count, count, count, count]),
+                    delay_us: Some(100),
+                },
+            ],
+        };
+        ws_transport.tx(&[tx_msg0, tx_msg1]).await?;
+        let rx_msgs = ws_transport.rx().await?;
+        debug!("Received message: {:?}", rx_msgs);
+        count = count.wrapping_add(1);
+        if count >= 255 {
             break;
         }
     }

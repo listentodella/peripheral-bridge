@@ -1,4 +1,6 @@
+use crate::pb::MsgBatch;
 use crate::{BridgeError, Msg, Transport};
+use anyhow::Result;
 use async_trait::async_trait;
 use futures_util::{SinkExt, StreamExt};
 use log::trace;
@@ -27,7 +29,7 @@ impl WebSocketTransport {
 
 #[async_trait]
 impl Transport for WebSocketTransport {
-    async fn connect(&mut self) -> Result<(), BridgeError> {
+    async fn connect(&mut self) -> Result<()> {
         trace!("try to connect {}", self.url);
         let listener = TcpListener::bind(&self.url).await?;
         let (conn, _) = listener.accept().await?;
@@ -36,7 +38,7 @@ impl Transport for WebSocketTransport {
         Ok(())
     }
 
-    async fn disconnect(&mut self) -> Result<(), BridgeError> {
+    async fn disconnect(&mut self) -> Result<()> {
         if let Some(mut ws_stream) = self.connection.take() {
             // 发送关闭帧
             ws_stream.close().await?;
@@ -51,8 +53,8 @@ impl Transport for WebSocketTransport {
         Ok(())
     }
 
-    async fn rx(&mut self) -> Result<Msg, BridgeError> {
-        let msg = self
+    async fn rx(&mut self) -> Result<MsgBatch> {
+        let ws_msg = self
             .connection
             .as_mut()
             .ok_or(BridgeError::ConnectionError("connection closed".into()))?
@@ -60,13 +62,16 @@ impl Transport for WebSocketTransport {
             .await
             .ok_or(BridgeError::ConnectionError("websocket closed".into()))??;
 
-        let msg = msg.into_payload().to_vec();
-        let msg = Msg::decode(msg.as_slice())?;
-        Ok(msg)
+        let buffer = ws_msg.into_payload().to_vec();
+        let msgs = MsgBatch::decode(buffer.as_slice())?;
+        Ok(msgs)
     }
 
-    async fn tx(&mut self, msg: Msg) -> Result<(), BridgeError> {
-        let buffer = msg.encode_to_vec();
+    async fn tx(&mut self, msgs: &[Msg]) -> Result<()> {
+        let batch = MsgBatch {
+            msgs: msgs.to_vec(),
+        };
+        let buffer = batch.encode_to_vec();
 
         self.connection
             .as_mut()

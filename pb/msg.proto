@@ -2,13 +2,11 @@ syntax = "proto3";
 package msg;
 
 
+message MsgBatch {
+    repeated Msg msgs = 1;
+}
 
-// 定义消息类型
-message Msg {
-    /// 传输类型
-    TransportType transport = 1;
-    /// 总线类型
-    BusType bus = 2;
+message BusOps {
     /// 操作类型
     Operation operation = 3;
     /// 地址
@@ -17,6 +15,16 @@ message Msg {
     optional bytes data = 5;
     /// 延时
     optional uint64 delay_us = 6;
+}
+
+// 定义消息类型
+message Msg {
+    /// 传输类型
+    TransportType transport = 1;
+    /// 总线类型
+    BusType bus = 2;
+    /// 操作序列
+    repeated BusOps seqs = 3;
 }
 
 // 定义枚举类型
