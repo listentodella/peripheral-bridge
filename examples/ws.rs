@@ -1,25 +1,33 @@
-use futures_util::{SinkExt, StreamExt};
-use log::{debug, info};
-use tokio::net::TcpListener;
-use tokio_websockets::{Message, ServerBuilder};
+use log::{debug, error, info};
+use peripheral_bridge::{pb::msg::*, transport::WebSocketTransport, Transport};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     env_logger::init();
+    let mut ws_transport = WebSocketTransport::new("0.0.0.0:8765".to_string()).await?;
 
-    let listener = TcpListener::bind("0.0.0.0:8765").await?;
-    info!("Listening on 0.0.0.0:8765");
+    if !ws_transport.is_connected() {
+        error!("WebSocket transport is not connected");
+        return Ok(());
+    }
+    let mut count = 0u8;
     loop {
-        let (conn, _) = listener.accept().await?;
-        let (_request, mut ws_stream) = ServerBuilder::new().accept(conn).await?;
-        ws_stream.send(Message::text("Hello, client!")).await?;
-        while let Some(Ok(item)) = ws_stream.next().await {
-            if item.is_binary() || item.is_text() {
-                debug!("Received: {:?}", item);
-                ws_stream.send(item).await?;
-            }
+        let tx_msg = Msg {
+            transport: TransportType::Cdc as i32,
+            bus: BusType::I2c as i32,
+            operation: Operation::Read as i32,
+            address: 0x50,
+            data: Some(vec![1, 2, 3, 4, count]),
+            delay_us: Some(1000),
+        };
+        ws_transport.tx(tx_msg).await?;
+        let rx_msg = ws_transport.rx().await?;
+        debug!("Received message: {:?}", rx_msg);
+        count += 1;
+        if count >= 10 {
+            break;
         }
     }
-
-    // Ok(())
+    info!("test done");
+    Ok(())
 }
