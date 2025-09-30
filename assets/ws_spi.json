@@ -1,0 +1,129 @@
+{
+    "name": "IMU_FLOW",
+    "detect": {
+        "msgs": [
+            {
+                "transport": 1,
+                "bus": 1,
+                "seqs": [
+                    {
+                        "operation": 1,
+                        "address": 0,
+                        "data": [
+                            0
+                        ],
+                        "delay_us": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "reset": {
+        "msgs": [
+            {
+                "transport": 1,
+                "bus": 1,
+                "seqs": [
+                    {
+                        "operation": 2,
+                        "address": 54,
+                        "data": [
+                            182
+                        ],
+                        "delay_us": 200000
+                    },
+                    {
+                        "operation": 1,
+                        "address": 51,
+                        "data": [
+                            0,
+                            0
+                        ],
+                        "delay_us": 200000
+                    }
+                ]
+            }
+        ]
+    },
+    "init": {
+        "msgs": [
+            {
+                "transport": 1,
+                "bus": 1,
+                "seqs": [
+                    {
+                        "operation": 2,
+                        "address": 87,
+                        "data": [
+                            7
+                        ],
+                        "delay_us": 100
+                    },
+                    {
+                        "operation": 2,
+                        "address": 16,
+                        "data": [
+                            98
+                        ],
+                        "delay_us": 100
+                    },
+                    {
+                        "operation": 2,
+                        "address": 15,
+                        "data": [
+                            2
+                        ],
+                        "delay_us": 100
+                    },
+                    {
+                        "operation": 2,
+                        "address": 17,
+                        "data": [
+                            197
+                        ],
+                        "delay_us": 100
+                    },
+                    {
+                        "operation": 2,
+                        "address": 62,
+                        "data": [
+                            71
+                        ],
+                        "delay_us": 100
+                    },
+                    {
+                        "operation": 2,
+                        "address": 49,
+                        "data": [
+                            32
+                        ],
+                        "delay_us": 100
+                    }
+                ]
+            }
+        ]
+    },
+    "data": {
+        "msgs": [
+            {
+                "transport": 1,
+                "bus": 1,
+                "seqs": [
+                    {
+                        "operation": 1,
+                        "address": 1,
+                        "data": [
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0
+                        ],
+                        "delay_us": 100
+                    }
+                ]
+            }
+        ]
+    }
+}
